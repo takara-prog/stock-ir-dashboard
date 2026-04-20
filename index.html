@@ -63,4 +63,109 @@ button:hover { background: #1e1e1e; }
 
   <div id="panel-paste" class="panel active">
     <textarea id="paste-input" placeholder="決算説明会・株主総会・IRレポートなど、分析したい発言を貼り付けてください..."></textarea>
-    <b
+    <button class="analyze-btn" onclick="analyze('paste')">この発言を分析する →</button>
+  </div>
+
+  <div id="panel-auto" class="panel">
+    <div class="row">
+      <input type="text" id="company-input" placeholder="企業名または証券コード（例：味の素、2802）" />
+      <button onclick="analyze('auto')">取得して分析 →</button>
+    </div>
+  </div>
+
+  <div id="results-area"></div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['paste','auto'][i] === tab));
+  document.getElementById('panel-paste').classList.toggle('active', tab === 'paste');
+  document.getElementById('panel-auto').classList.toggle('active', tab === 'auto');
+}
+
+async function callClaude(messages) {
+  const apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { alert('APIキーを入力してください'); throw new Error('no key'); }
+  const res = await fetch('/.netlify/functions/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ apiKey, messages })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || data.error);
+  return data.content.map(b => b.type === 'text' ? b.text : '').filter(Boolean).join('\n');
+}
+
+function extractJSON(text) {
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) return JSON.parse(match[0]);
+  throw new Error('JSON not found');
+}
+
+async function analyze(mode) {
+  const area = document.getElementById('results-area');
+  area.innerHTML = '<div class="loading">分析中です（少々お待ちください）...</div>';
+  try {
+    let prompt;
+    if (mode === 'paste') {
+      const input = document.getElementById('paste-input').value.trim();
+      if (!input) { area.innerHTML = '<div class="error">発言を入力してください</div>'; return; }
+      prompt = `以下のIR発言を分析し、必ずJSONのみで返してください。前置き不要。\n\n発言:\n${input}\n\n形式:{"company":"","summary":{"high":0,"mid":0,"low":0,"verdict":"総評"},"statements":[{"text":"発言要約30字以内","impact":"high","axes":{"経営思想":"一言","資本配分":"一言","株主還元":"一言","成長投資":"一言","危機対応":"一言","競争優位":"一言","経営スタイル":"一言"},"note":"本音度20字"}]}`;
+    } else {
+      const company = document.getElementById('company-input').value.trim();
+      if (!company) { area.innerHTML = '<div class="error">企業名を入力してください</div>'; return; }
+      prompt = `${company}の最新IR・決算説明会の発言をウェブ検索で3〜4件調べ、JSONのみで返してください。前置き不要。\n\n形式:{"company":"${company}","summary":{"high":0,"mid":0,"low":0,"verdict":"総評"},"statements":[{"text":"発言要約30字以内","impact":"high","axes":{"経営思想":"一言","資本配分":"一言","株主還元":"一言","成長投資":"一言","危機対応":"一言","競争優位":"一言","経営スタイル":"一言"},"note":"本音度20字"}]}`;
+    }
+    const text = await callClaude([{ role: 'user', content: prompt }]);
+    const d = extractJSON(text);
+    render(d);
+  } catch(e) {
+    area.innerHTML = `<div class="error">エラー: ${e.message}</div>`;
+  }
+}
+
+function render(d) {
+  const area = document.getElementById('results-area');
+  const s = d.summary || {};
+  const stmts = d.statements || [];
+  const groups = {
+    high: stmts.filter(x => x.impact === 'high'),
+    mid: stmts.filter(x => x.impact === 'mid'),
+    low: stmts.filter(x => x.impact === 'low')
+  };
+  const badgeClass = { high: 'badge-high', mid: 'badge-mid', low: 'badge-low' };
+  const badgeLabel = { high: '高影響度', mid: '中影響度', low: '低影響度' };
+
+  function renderGroup(items, impact) {
+    if (!items.length) return '';
+    return `<div class="impact-group">
+      <div class="impact-header">
+        <span class="badge ${badgeClass[impact]}">${badgeLabel[impact]}</span>
+        <span style="font-size:13px;color:#666">${items.length}件</span>
+      </div>
+      ${items.map(st => `<div class="statement-card">
+        <div class="statement-text">${st.text}</div>
+        <div class="axes">${Object.entries(st.axes||{}).map(([k,v]) => `<div class="axis">${k}：<span>${v}</span></div>`).join('')}</div>
+        ${st.note ? `<div class="note">本音度：${st.note}</div>` : ''}
+      </div>`).join('')}
+    </div>`;
+  }
+
+  area.innerHTML = `
+    ${d.company ? `<div style="font-size:13px;color:#666;margin-top:1.25rem;margin-bottom:12px;">${d.company} の分析結果</div>` : ''}
+    <div class="summary-grid">
+      <div class="scard"><div class="scard-label">高影響度</div><div class="scard-val" style="color:#f87171">${s.high||0}</div></div>
+      <div class="scard"><div class="scard-label">中影響度</div><div class="scard-val" style="color:#fbbf24">${s.mid||0}</div></div>
+      <div class="scard"><div class="scard-label">低影響度</div><div class="scard-val" style="color:#4ade80">${s.low||0}</div></div>
+      <div class="scard"><div class="scard-label">総評</div><div class="verdict">${s.verdict||'—'}</div></div>
+    </div>
+    <div class="section-label">発言一覧（影響度別）</div>
+    ${renderGroup(groups.high,'high')}
+    ${renderGroup(groups.mid,'mid')}
+    ${renderGroup(groups.low,'low')}`;
+}
+
+document.getElementById('company-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') analyze('auto'); });
+</script>
+</body>
+</html>
