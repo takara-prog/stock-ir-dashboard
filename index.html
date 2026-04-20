@@ -162,20 +162,4 @@ function render(d) {
   }
 
   area.innerHTML = `
-    ${d.company ? `<div style="font-size:13px;color:#666;margin-top:1.25rem;margin-bottom:12px;">${d.company} の分析結果</div>` : ''}
-    <div class="summary-grid">
-      <div class="scard"><div class="scard-label">高影響度</div><div class="scard-val" style="color:#f87171">${s.high||0}</div></div>
-      <div class="scard"><div class="scard-label">中影響度</div><div class="scard-val" style="color:#fbbf24">${s.mid||0}</div></div>
-      <div class="scard"><div class="scard-label">低影響度</div><div class="scard-val" style="color:#4ade80">${s.low||0}</div></div>
-      <div class="scard"><div class="scard-label">総評</div><div class="verdict">${s.verdict||'—'}</div></div>
-    </div>
-    <div class="section-label">発言一覧（影響度別）</div>
-    ${renderGroup(groups.high,'high')}
-    ${renderGroup(groups.mid,'mid')}
-    ${renderGroup(groups.low,'low')}`;
-}
-
-document.getElementById('company-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') analyze('auto'); });
-</script>
-</body>
-</html>
+    ${d.company ? `<div style="font-size:13px;color:#666
