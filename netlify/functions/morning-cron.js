@@ -2,9 +2,11 @@ const fetch = require('node-fetch');
 
 exports.handler = async function(event) {
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-  const LINE_NOTIFY_TOKEN = process.env.LINE_NOTIFY_TOKEN;
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  const REPORT_EMAIL = process.env.REPORT_EMAIL;
 
-  if (!ANTHROPIC_API_KEY || !LINE_NOTIFY_TOKEN) {
+  if (!ANTHROPIC_API_KEY || !RESEND_API_KEY || !REPORT_EMAIL) {
+    console.error('Missing environment variables');
     return { statusCode: 500, body: 'Missing env vars' };
   }
 
@@ -36,24 +38,21 @@ exports.handler = async function(event) {
     }
     if (!reportText) throw new Error('No text content from Claude');
 
-    const header = `\n🌅【昨夜の結果まとめ】\n${new Date().toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo' })}\n${'─'.repeat(20)}\n\n`;
-    const fullMessage = header + reportText;
-    const chunks = [];
-    for (let i = 0; i < fullMessage.length; i += 1900) {
-      chunks.push(fullMessage.slice(i, i + 1900));
-    }
+    const dateStr = new Date().toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo' });
 
-    for (const chunk of chunks) {
-      await fetch('https://notify-api.line.me/api/notify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Bearer ${LINE_NOTIFY_TOKEN}`
-        },
-        body: new URLSearchParams({ message: chunk })
-      });
-      await new Promise(r => setTimeout(r, 500));
-    }
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`
+      },
+      body: JSON.stringify({
+        from: 'onboarding@resend.dev',
+        to: REPORT_EMAIL,
+        subject: `🌅【昨夜の結果まとめ】${dateStr}`,
+        text: reportText
+      })
+    });
 
     return { statusCode: 200, body: 'Morning report sent' };
   } catch (err) {
