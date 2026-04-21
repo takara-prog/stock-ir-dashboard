@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -100,7 +99,6 @@ button:hover { background: #1e1e1e; }
 .search-row { display: flex; gap: 8px; margin-bottom: 1rem; }
 .search-row input { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 8px 12px; color: #e0e0e0; font-size: 14px; }
 </style>
-
 </head>
 <body>
 <div class="container">
@@ -119,7 +117,6 @@ button:hover { background: #1e1e1e; }
   </div>
 
   <!-- ===== IR分析パネル ===== -->
-
   <div id="main-ir" class="main-panel active">
     <div class="tabs">
       <button class="tab active" onclick="switchTab('paste')">テキスト貼り付け</button>
@@ -139,7 +136,6 @@ button:hover { background: #1e1e1e; }
   </div>
 
   <!-- ===== 市場ダッシュボードパネル ===== -->
-
   <div id="main-market" class="main-panel">
     <button onclick="loadAll()" style="font-size:13px;padding:6px 14px;margin-bottom:1rem;">更新 ↻</button>
     <div class="section-label">主要指数</div>
@@ -157,7 +153,6 @@ button:hover { background: #1e1e1e; }
   </div>
 
   <!-- ===== レポートパネル ===== -->
-
   <div id="main-report" class="main-panel">
     <div class="cron-grid">
       <div class="cron-card">
@@ -172,17 +167,14 @@ button:hover { background: #1e1e1e; }
       </div>
     </div>
 
-```
-<div style="display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;">
-  <button class="analyze-btn" onclick="generateReport('evening')" style="width:auto;flex:1;">🌙 今夜の予習レポートを今すぐ生成</button>
-  <button class="analyze-btn" onclick="generateReport('morning')" style="width:auto;flex:1;">🌅 朝のまとめを今すぐ生成</button>
-</div>
+    <div style="display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;">
+      <button class="analyze-btn" onclick="generateReport('evening')" style="width:auto;flex:1;">🌙 今夜の予習レポートを今すぐ生成</button>
+      <button class="analyze-btn" onclick="generateReport('morning')" style="width:auto;flex:1;">🌅 朝のまとめを今すぐ生成</button>
+    </div>
 
-<div id="report-area">
-  <div class="loading" style="color:#555;font-size:13px;">ボタンを押してレポートを生成してください</div>
-</div>
-```
-
+    <div id="report-area">
+      <div class="loading" style="color:#555;font-size:13px;">ボタンを押してレポートを生成してください</div>
+    </div>
   </div>
 </div>
 
@@ -213,8 +205,13 @@ async function callClaude(messages, maxTokens = 2000) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ apiKey, messages, maxTokens })
   });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`サーバーエラー: ${res.status} - ${errText}`);
+  }
   const data = await res.json();
   if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+  if (!data.content) throw new Error('レスポンスエラー: ' + JSON.stringify(data));
   return data.content.map(b => b.type === 'text' ? b.text : '').filter(Boolean).join('\n');
 }
 
@@ -497,6 +494,5 @@ function copyReport() {
 document.getElementById('company-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') analyze('auto'); });
 document.getElementById('stock-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') searchStock(); });
 </script>
-
 </body>
 </html>
