@@ -197,7 +197,7 @@ function switchTab(tab) {
 }
 
 // ===== Claude API call =====
-async function callClaude(messages, maxTokens = 2000) {
+async function callClaude(messages, maxTokens = 800) {
   const apiKey = document.getElementById('api-key').value.trim();
   if (!apiKey) { alert('APIキーを入力してください'); throw new Error('no key'); }
   const res = await fetch('/.netlify/functions/analyze', {
@@ -376,7 +376,7 @@ async function generateReport(type) {
 「おはよう！昨夜はね〜」から始めて。最後に「今日も良いトレードを！🌅」で締めてください。`;
 
   try {
-    const text = await callClaude([{ role: 'user', content: prompt }], 2000);
+    const text = await callClaude([{ role: 'user', content: prompt }], 800);
     const title = isEvening ? '🌙 今夜の予習レポート' : '🌅 昨夜の結果まとめ';
     const now = new Date().toLocaleDateString('ja-JP', { month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
 
