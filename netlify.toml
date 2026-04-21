@@ -1,0 +1,10 @@
+[build]
+  functions = "netlify/functions"
+
+[[scheduled-functions]]
+  name = "report-cron"
+  schedule = "0 12 * * 1-5"
+
+[[scheduled-functions]]
+  name = "morning-cron"
+  schedule = "0 20 * * 2-6"
