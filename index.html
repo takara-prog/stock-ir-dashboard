@@ -200,7 +200,7 @@ function switchTab(tab) {
 async function callClaude(messages, maxTokens = 800) {
   const apiKey = document.getElementById('api-key').value.trim();
   if (!apiKey) { alert('APIキーを入力してください'); throw new Error('no key'); }
-  const res = await fetch('/.netlify/functions/analyze', {
+  const res = await fetch('https://stock-ir-analyze.ayame-hg1994.workers.dev', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ apiKey, messages, maxTokens })
