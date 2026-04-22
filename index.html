@@ -203,7 +203,7 @@ async function callClaude(messages, maxTokens = 800) {
   const res = await fetch('https://stock-ir-analyze.ayame-hg1994.workers.dev', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ apiKey, messages, maxTokens })
+    body: JSON.stringify({ messages, maxTokens })
   });
   if (!res.ok) {
     const errText = await res.text();
