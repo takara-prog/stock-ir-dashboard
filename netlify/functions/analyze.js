@@ -22,7 +22,6 @@ exports.handler = async function(event) {
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
         max_tokens: maxTokens,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: body.messages
       })
     });
