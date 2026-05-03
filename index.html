@@ -10,26 +10,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem; }
 h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
 .sub { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
-
-/* API Key */
 .api-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
 .api-label { font-size: 12px; color: #666; white-space: nowrap; }
 .api-row input { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 8px 12px; color: #e0e0e0; font-size: 13px; }
-
-/* Main Tabs */
 .main-tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; flex-wrap: wrap; }
 .main-tab { font-size: 13px; padding: 7px 16px; border-radius: 8px; border: 1px solid #333; background: transparent; color: #888; cursor: pointer; transition: all 0.15s; }
 .main-tab.active { background: #1e1e1e; color: #e0e0e0; border-color: #555; font-weight: 500; }
 .main-panel { display: none; }
 .main-panel.active { display: block; }
-
-/* Sub Tabs */
 .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; }
 .tab { font-size: 12px; padding: 5px 14px; border-radius: 6px; border: 1px solid #2a2a2a; background: transparent; color: #777; cursor: pointer; }
 .tab.active { background: #252525; color: #ccc; }
 .panel { display: none; }
 .panel.active { display: block; }
-
 textarea { width: 100%; min-height: 120px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px 12px; color: #e0e0e0; font-size: 14px; resize: vertical; font-family: inherit; }
 .row { display: flex; gap: 8px; }
 .row input { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 8px 12px; color: #e0e0e0; font-size: 14px; }
@@ -37,8 +30,6 @@ button { background: transparent; border: 1px solid #444; border-radius: 8px; co
 button:hover { background: #1e1e1e; }
 .analyze-btn { width: 100%; margin-top: 8px; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; background: #1a1a1a; border: 1px solid #444; color: #e0e0e0; }
 .analyze-btn:hover { background: #252525; }
-
-/* Results */
 #results-area { margin-top: 1.5rem; }
 .loading { color: #666; font-size: 14px; padding: 1rem 0; }
 .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #555; text-transform: uppercase; margin: 1.5rem 0 0.75rem; }
@@ -57,8 +48,6 @@ button:hover { background: #1e1e1e; }
 .stmt-meta { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { font-size: 11px; background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 4px; padding: 2px 8px; color: #888; }
 .note { font-size: 12px; color: #777; margin-top: 6px; font-style: italic; }
-
-/* Dashboard */
 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }
 .card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 14px 16px; }
 .card-label { font-size: 11px; color: #555; margin-bottom: 6px; }
@@ -73,8 +62,6 @@ button:hover { background: #1e1e1e; }
 .news-item:last-child { border-bottom: none; }
 .news-title { font-size: 14px; line-height: 1.5; }
 .news-meta { font-size: 11px; color: #555; margin-top: 3px; }
-
-/* Report Panel */
 .report-box { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
 .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .report-title { font-size: 14px; font-weight: 500; }
@@ -82,20 +69,11 @@ button:hover { background: #1e1e1e; }
 .report-text { font-size: 14px; line-height: 1.8; color: #ccc; white-space: pre-wrap; }
 .report-actions { display: flex; gap: 8px; margin-top: 1rem; }
 .report-actions button { font-size: 12px; padding: 6px 14px; }
-.btn-primary { background: #1d4ed8 !important; border-color: #1d4ed8 !important; color: white !important; }
-.btn-primary:hover { background: #1e40af !important; }
-
-/* Cron Status */
 .cron-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
 .cron-card { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 14px 16px; }
 .cron-time { font-size: 24px; font-weight: 600; color: #60a5fa; }
 .cron-desc { font-size: 12px; color: #666; margin-top: 4px; }
 .cron-status { font-size: 11px; margin-top: 8px; padding: 3px 8px; border-radius: 4px; display: inline-block; background: rgba(74,222,128,0.1); color: #4ade80; }
-
-/* PDF Button */
-.pdf-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 16px; background: #7c3aed; border: none; border-radius: 8px; color: white; cursor: pointer; }
-.pdf-btn:hover { background: #6d28d9; }
-
 .search-row { display: flex; gap: 8px; margin-bottom: 1rem; }
 .search-row input { flex: 1; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 8px 12px; color: #e0e0e0; font-size: 14px; }
 </style>
@@ -116,7 +94,6 @@ button:hover { background: #1e1e1e; }
     <button class="main-tab" onclick="switchMain('report')">🌙 レポート</button>
   </div>
 
-  <!-- ===== IR分析パネル ===== -->
   <div id="main-ir" class="main-panel active">
     <div class="tabs">
       <button class="tab active" onclick="switchTab('paste')">テキスト貼り付け</button>
@@ -135,7 +112,6 @@ button:hover { background: #1e1e1e; }
     <div id="results-area"></div>
   </div>
 
-  <!-- ===== 市場ダッシュボードパネル ===== -->
   <div id="main-market" class="main-panel">
     <button onclick="loadAll()" style="font-size:13px;padding:6px 14px;margin-bottom:1rem;">更新 ↻</button>
     <div class="section-label">主要指数</div>
@@ -152,26 +128,23 @@ button:hover { background: #1e1e1e; }
     <div id="news-area"><div class="loading">ニュースを取得中...</div></div>
   </div>
 
-  <!-- ===== レポートパネル ===== -->
   <div id="main-report" class="main-panel">
     <div class="cron-grid">
       <div class="cron-card">
         <div class="cron-time">🌙 21:00</div>
         <div class="cron-desc">今夜の予習レポート</div>
-        <div class="cron-status">● LINE自動送信</div>
+        <div class="cron-status">● 手動生成</div>
       </div>
       <div class="cron-card">
         <div class="cron-time">🌅 5:00</div>
         <div class="cron-desc">昨夜の結果まとめ</div>
-        <div class="cron-status">● LINE自動送信</div>
+        <div class="cron-status">● 手動生成</div>
       </div>
     </div>
-
     <div style="display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;">
       <button class="analyze-btn" onclick="generateReport('evening')" style="width:auto;flex:1;">🌙 今夜の予習レポートを今すぐ生成</button>
       <button class="analyze-btn" onclick="generateReport('morning')" style="width:auto;flex:1;">🌅 朝のまとめを今すぐ生成</button>
     </div>
-
     <div id="report-area">
       <div class="loading" style="color:#555;font-size:13px;">ボタンを押してレポートを生成してください</div>
     </div>
@@ -179,7 +152,6 @@ button:hover { background: #1e1e1e; }
 </div>
 
 <script>
-// ===== Tab switching =====
 function switchMain(tab) {
   document.querySelectorAll('.main-tab').forEach((t,i) => {
     t.classList.toggle('active', ['ir','market','report'][i] === tab);
@@ -197,13 +169,14 @@ function switchTab(tab) {
 }
 
 // ===== Claude API call =====
+// 変更点：workers.dev → Netlify Functions に修正
 async function callClaude(messages, maxTokens = 800) {
   const apiKey = document.getElementById('api-key').value.trim();
   if (!apiKey) { alert('APIキーを入力してください'); throw new Error('no key'); }
-  const res = await fetch('https://stock-ir-analyze.ayame-hg1994.workers.dev', {
+  const res = await fetch('/.netlify/functions/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages, maxTokens })
+    body: JSON.stringify({ apiKey, messages, maxTokens })
   });
   if (!res.ok) {
     const errText = await res.text();
@@ -215,7 +188,6 @@ async function callClaude(messages, maxTokens = 800) {
   return data.content.map(b => b.type === 'text' ? b.text : '').filter(Boolean).join('\n');
 }
 
-// ===== IR分析 =====
 async function analyze(mode) {
   const area = document.getElementById('results-area');
   area.innerHTML = '<div class="loading">分析中... しばらくお待ちください</div>';
@@ -228,271 +200,4 @@ async function analyze(mode) {
     } else {
       const company = document.getElementById('company-input').value.trim();
       if (!company) { area.innerHTML = ''; return; }
-      prompt = `${company}の最新のIR・決算発言を検索して分析してください。`;
-    }
-    prompt += `\n\n以下のJSON形式のみで返してください（前置き不要）:\n{"company":"企業名","summary":{"high":高影響度の数,"mid":中影響度の数,"low":低影響度の数,"verdict":"総評100字"},"statements":[{"text":"発言内容","impact":"high|mid|low","axes":["成長性","収益性","リスク","株主還元","経営方針","市場環境","ESG"],"note":"本音度コメント50字"}]}`;
-    const raw = await callClaude([{ role: 'user', content: prompt }]);
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const d = JSON.parse(clean);
-    renderResults(d, area);
-  } catch(e) {
-    area.innerHTML = `<div class="loading" style="color:#f87171;">エラー: ${e.message}</div>`;
-  }
-}
-
-function renderResults(d, area) {
-  const s = d.summary || {};
-  const groups = { high: [], mid: [], low: [] };
-  (d.statements || []).forEach(st => (groups[st.impact] || groups.low).push(st));
-  const renderGroup = (list, cls) => {
-    if (!list.length) return '';
-    const labels = { high:'高影響度', mid:'中影響度', low:'低影響度' };
-    return `<div class="group-header"><span class="badge ${cls}">${labels[cls]}</span></div>`
-      + list.map(st => `<div class="stmt">
-        <div class="stmt-text">${st.text}</div>
-        <div class="stmt-meta">${(st.axes||[]).map(a=>`<span class="tag">${a}</span>`).join('')}</div>
-        ${st.note ? `<div class="note">本音度：${st.note}</div>` : ''}
-      </div>`).join('');
-  };
-  area.innerHTML = `
-    ${d.company ? `<div style="font-size:13px;color:#666;margin:1.25rem 0 12px;">${d.company} の分析結果</div>` : ''}
-    <div class="summary-grid">
-      <div class="scard"><div class="scard-label">高影響度</div><div class="scard-val" style="color:#f87171">${s.high||0}</div></div>
-      <div class="scard"><div class="scard-label">中影響度</div><div class="scard-val" style="color:#fbbf24">${s.mid||0}</div></div>
-      <div class="scard"><div class="scard-label">低影響度</div><div class="scard-val" style="color:#4ade80">${s.low||0}</div></div>
-      <div class="scard"><div class="scard-label">総評</div><div class="verdict">${s.verdict||'—'}</div></div>
-    </div>
-    <div class="section-label">発言一覧（影響度別）</div>
-    ${renderGroup(groups.high,'high')}
-    ${renderGroup(groups.mid,'mid')}
-    ${renderGroup(groups.low,'low')}`;
-}
-
-// ===== 市場ダッシュボード =====
-const STOCKS = [
-  { code: "7203", name: "トヨタ自動車" },
-  { code: "9984", name: "ソフトバンクG" },
-  { code: "6758", name: "ソニーグループ" },
-  { code: "8306", name: "三菱UFJ" },
-  { code: "6861", name: "キーエンス" },
-];
-
-async function loadAll() {
-  loadIndexes();
-  loadStocks();
-  loadNews();
-}
-
-async function loadIndexes() {
-  try {
-    const text = await callClaude([{ role: 'user', content: '今日の日経平均・TOPIX・グロース250の現在値と前日比(%)をJSONのみで返してください。形式:{"nikkei":{"value":"39000","change":"+0.5%"},"topix":{"value":"2700","change":"-0.1%"},"mothers":{"value":"650","change":"+1.2%"}} preambleなし' }]);
-    const d = JSON.parse(text.replace(/```json|```/g,'').trim());
-    const el = document.getElementById('index-cards');
-    el.innerHTML = [
-      { key:'nikkei', label:'日経平均' },
-      { key:'topix', label:'TOPIX' },
-      { key:'mothers', label:'グロース250' }
-    ].map(({key,label}) => {
-      const v = d[key] || {};
-      const up = (v.change||'').startsWith('+');
-      return `<div class="card"><div class="card-label">${label}</div><div class="card-value">${v.value||'—'}</div><div class="card-change ${up?'up':'down'}">${v.change||'—'}</div></div>`;
-    }).join('');
-  } catch(e) {
-    document.getElementById('index-cards').innerHTML = `<div class="loading" style="color:#f87171;">取得失敗</div>`;
-  }
-}
-
-async function loadStocks() {
-  const area = document.getElementById('stock-area');
-  area.innerHTML = '<div class="loading">取得中...</div>';
-  try {
-    const list = STOCKS.map(s=>`${s.code}(${s.name})`).join('、');
-    const text = await callClaude([{ role: 'user', content: `以下の日本株の現在値・前日比・一行コメントをJSONで返してください: ${list}\n形式:[{"code":"7203","name":"トヨタ自動車","price":"3500","change":"+1.2%","comment":"好調"}] preambleなし` }]);
-    const stocks = JSON.parse(text.replace(/```json|```/g,'').trim());
-    area.innerHTML = stocks.map(s => {
-      const up = (s.change||'').startsWith('+');
-      return `<div class="stock-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="stock-name">${s.name}</div><div class="stock-meta">${s.code}</div></div><div style="text-align:right"><div style="font-size:18px;font-weight:600">${s.price}</div><div class="card-change ${up?'up':'down'}">${s.change}</div></div></div>${s.comment?`<div style="font-size:12px;color:#666;margin-top:6px">${s.comment}</div>`:''}</div>`;
-    }).join('');
-  } catch(e) {
-    area.innerHTML = `<div class="loading" style="color:#f87171;">取得失敗</div>`;
-  }
-}
-
-async function searchStock() {
-  const q = document.getElementById('stock-input').value.trim();
-  if (!q) return;
-  const area = document.getElementById('stock-area');
-  area.innerHTML = '<div class="loading">検索中...</div>';
-  try {
-    const text = await callClaude([{ role: 'user', content: `「${q}」の株価・前日比・企業概要・最新ニュースを調べて、JSONで返してください。形式:[{"code":"コード","name":"企業名","price":"株価","change":"前日比%","comment":"概要と最新動向"}]` }]);
-    const stocks = JSON.parse(text.replace(/```json|```/g,'').trim());
-    area.innerHTML = stocks.map(s => {
-      const up = (s.change||'').startsWith('+');
-      return `<div class="stock-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="stock-name">${s.name}</div><div class="stock-meta">${s.code}</div></div><div style="text-align:right"><div style="font-size:18px;font-weight:600">${s.price}</div><div class="card-change ${up?'up':'down'}">${s.change}</div></div></div>${s.comment?`<div style="font-size:12px;color:#666;margin-top:6px">${s.comment}</div>`:''}</div>`;
-    }).join('');
-  } catch(e) {
-    area.innerHTML = `<div class="loading" style="color:#f87171;">取得失敗</div>`;
-  }
-}
-
-async function loadNews() {
-  const area = document.getElementById('news-area');
-  area.innerHTML = '<div class="loading">取得中...</div>';
-  try {
-    const text = await callClaude([{ role: 'user', content: '今日の日本・米国・欧州・アジアの主要金融・経済ニュースを5件、JSONで返してください。形式:[{"title":"ニュースタイトル","region":"🇯🇵日本|🇺🇸米国|🇪🇺欧州|🌏アジア","time":"時刻または日付","summary":"概要50字"}] preambleなし' }]);
-    const news = JSON.parse(text.replace(/```json|```/g,'').trim());
-    area.innerHTML = news.map(n => `<div class="news-item"><div class="news-title">${n.region} ${n.title}</div><div class="news-meta">${n.time}${n.summary?` · ${n.summary}`:''}</div></div>`).join('');
-  } catch(e) {
-    area.innerHTML = `<div class="loading" style="color:#f87171;">取得失敗</div>`;
-  }
-}
-
-// ===== レポート生成 =====
-async function generateReport(type) {
-  const area = document.getElementById('report-area');
-  const isEvening = type === 'evening';
-  area.innerHTML = '<div class="loading">レポートを生成中... （30〜60秒かかります）</div>';
-
-  const prompt = isEvening
-    ? `あなたは親しみやすい株式アナリストです。今夜の投資家向け「予習レポート」を口語体で書いてください。
-
-1. 📰 今日の主要ニュース（日本・米国・世界）
-2. 🇯🇵 東京市場の今日の動き（日経平均・主要セクター）
-3. 🇺🇸 今夜のNY市場の注目ポイント（経済指標・決算発表）
-4. 🌍 各国注目ニュース（欧州・アジア・新興国）
-5. ⚡ 明日の東京市場への影響予測
-6. 💡 今夜チェックしておきたい3つのこと
-
-友達に話しかけるような口語体で。最後に「今夜もがんばろう！📈」で締めてください。`
-    : `あなたは親しみやすい株式アナリストです。昨夜のNY市場の結果と今朝の東京市場の開幕予測を口語体でまとめてください。
-
-1. 🌙 昨夜のNY市場結果（ダウ・S&P500・ナスダック）
-2. 📊 セクター別パフォーマンス（勝ち組・負け組）
-3. 💬 昨夜の決算発表・主要ニュースの影響
-4. 🌍 欧州・アジア市場の動き
-5. 🇯🇵 今朝の東京市場 開幕予測
-6. 📌 今日の東京市場で注目する銘柄・セクター3つ
-
-「おはよう！昨夜はね〜」から始めて。最後に「今日も良いトレードを！🌅」で締めてください。`;
-
-  try {
-    const text = await callClaude([{ role: 'user', content: prompt }], 800);
-    const title = isEvening ? '🌙 今夜の予習レポート' : '🌅 昨夜の結果まとめ';
-    const now = new Date().toLocaleDateString('ja-JP', { month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
-
-    area.innerHTML = `
-      <div class="report-box">
-        <div class="report-header">
-          <span class="report-title">${title}</span>
-          <span class="report-badge">${now}</span>
-        </div>
-        <div class="report-text" id="report-content">${text}</div>
-        <div class="report-actions">
-          <button class="pdf-btn" onclick="downloadPDF('${type}')">📄 PDFで保存</button>
-          <button onclick="copyReport()">📋 コピー</button>
-        </div>
-      </div>`;
-  } catch(e) {
-    area.innerHTML = `<div class="loading" style="color:#f87171;">エラー: ${e.message}</div>`;
-  }
-}
-
-// ===== PDF生成 =====
-async function downloadPDF(type) {
-  const content = document.getElementById('report-content');
-  if (!content) return;
-
-  const text = content.innerText;
-  const title = type === 'evening' ? '今夜の予習レポート' : '昨夜の結果まとめ';
-  const dateStr = new Date().toLocaleDateString('ja-JP');
-
-  // jsPDFライブラリを動的ロード
-  if (!window.jspdf) {
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    document.head.appendChild(script);
-    await new Promise(r => script.onload = r);
-  }
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
-  // ページ1：手書き風因果関係図（SVGをCanvasに変換）
-  doc.setFillColor(15, 15, 15);
-  doc.rect(0, 0, 210, 297, 'F');
-
-  doc.setTextColor(224, 224, 224);
-  doc.setFontSize(18);
-  doc.text(`📊 ${title}`, 20, 25);
-
-  doc.setFontSize(10);
-  doc.setTextColor(136, 136, 136);
-  doc.text(dateStr, 20, 33);
-
-  // 因果関係図（手書き風ボックス）
-  doc.setDrawColor(100, 100, 100);
-  doc.setTextColor(200, 200, 200);
-  doc.setFontSize(9);
-
-  const boxes = [
-    { x: 20, y: 50, w: 50, h: 20, text: '🌍 海外市場動向', color: [60, 100, 180] },
-    { x: 80, y: 50, w: 50, h: 20, text: '📰 主要ニュース', color: [100, 60, 180] },
-    { x: 140, y: 50, w: 50, h: 20, text: '📊 経済指標', color: [60, 150, 100] },
-    { x: 50, y: 90, w: 50, h: 20, text: '🇺🇸 NY市場', color: [180, 100, 60] },
-    { x: 110, y: 90, w: 50, h: 20, text: '🌏 アジア市場', color: [60, 150, 180] },
-    { x: 75, y: 130, w: 60, h: 20, text: '🇯🇵 東京市場予測', color: [180, 60, 100] },
-  ];
-
-  boxes.forEach(b => {
-    doc.setFillColor(...b.color);
-    doc.roundedRect(b.x, b.y, b.w, b.h, 3, 3, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.text(b.text, b.x + 2, b.y + 13, { maxWidth: b.w - 4 });
-  });
-
-  // 矢印（線）
-  doc.setDrawColor(150, 150, 150);
-  doc.line(45, 70, 65, 90);   // 海外→NY
-  doc.line(105, 70, 90, 90);  // ニュース→NY
-  doc.line(105, 70, 130, 90); // ニュース→アジア
-  doc.line(165, 70, 140, 90); // 指標→アジア
-  doc.line(75, 110, 95, 130); // NY→東京
-  doc.line(135, 110, 115, 130); // アジア→東京
-
-  doc.setTextColor(100, 150, 255);
-  doc.setFontSize(11);
-  doc.text('因果関係マップ', 20, 170);
-
-  // ページ2：詳細解説
-  doc.addPage();
-  doc.setFillColor(15, 15, 15);
-  doc.rect(0, 0, 210, 297, 'F');
-
-  doc.setTextColor(224, 224, 224);
-  doc.setFontSize(14);
-  doc.text(`${title} — 詳細解説`, 20, 25);
-  doc.setFontSize(10);
-  doc.setTextColor(136, 136, 136);
-  doc.text(dateStr, 20, 33);
-
-  doc.setTextColor(200, 200, 200);
-  doc.setFontSize(9);
-  const lines = doc.splitTextToSize(text, 170);
-  doc.text(lines, 20, 45);
-
-  doc.save(`stock-report-${type}-${dateStr}.pdf`);
-}
-
-function copyReport() {
-  const content = document.getElementById('report-content');
-  if (content) {
-    navigator.clipboard.writeText(content.innerText).then(() => alert('コピーしました！'));
-  }
-}
-
-// ===== Event listeners =====
-document.getElementById('company-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') analyze('auto'); });
-document.getElementById('stock-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') searchStock(); });
-</script>
-</body>
-</html>
+      prompt = `${company}の最新のIR・決算
