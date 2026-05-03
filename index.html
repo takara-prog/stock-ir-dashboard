@@ -200,4 +200,153 @@ async function analyze(mode) {
     } else {
       const company = document.getElementById('company-input').value.trim();
       if (!company) { area.innerHTML = ''; return; }
-      prompt = `${company}の最新のIR・決算
+      prompt = `${company}の最新のIR・決算発言を検索して分析してください。`;
+    }
+    prompt += `\n\n以下のJSON形式のみで返してください（前置き不要）:\n{"company":"企業名","summary":{"high":高影響度の数,"mid":中影響度の数,"low":低影響度の数,"verdict":"総評100字"},"statements":[{"text":"発言内容","impact":"high|mid|low","axes":["成長性","収益性","リスク","株主還元","経営方針","市場環境","ESG"],"note":"本音度コメント50字"}]}`;
+    const raw = await callClaude([{ role: 'user', content: prompt }]);
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const d = JSON.parse(clean);
+    renderResults(d, area);
+  } catch(e) {
+    area.innerHTML = `<div class="loading" style="color:#f87171;">エラー: ${e.message}</div>`;
+  }
+}
+
+function renderResults(d, area) {
+  const s = d.summary || {};
+  const groups = { high: [], mid: [], low: [] };
+  (d.statements || []).forEach(st => (groups[st.impact] || groups.low).push(st));
+  const renderGroup = (list, cls) => {
+    if (!list.length) return '';
+    const labels = { high:'高影響度', mid:'中影響度', low:'低影響度' };
+    return `<div class="group-header"><span class="badge ${cls}">${labels[cls]}</span></div>`
+      + list.map(st => `<div class="stmt">
+        <div class="stmt-text">${st.text}</div>
+        <div class="stmt-meta">${(st.axes||[]).map(a=>`<span class="tag">${a}</span>`).join('')}</div>
+        ${st.note ? `<div class="note">本音度：${st.note}</div>` : ''}
+      </div>`).join('');
+  };
+  area.innerHTML = `
+    ${d.company ? `<div style="font-size:13px;color:#666;margin:1.25rem 0 12px;">${d.company} の分析結果</div>` : ''}
+    <div class="summary-grid">
+      <div class="scard"><div class="scard-label">高影響度</div><div class="scard-val" style="color:#f87171">${s.high||0}</div></div>
+      <div class="scard"><div class="scard-label">中影響度</div><div class="scard-val" style="color:#fbbf24">${s.mid||0}</div></div>
+      <div class="scard"><div class="scard-label">低影響度</div><div class="scard-val" style="color:#4ade80">${s.low||0}</div></div>
+      <div class="scard"><div class="scard-label">総評</div><div class="verdict">${s.verdict||'—'}</div></div>
+    </div>
+    <div class="section-label">発言一覧（影響度別）</div>
+    ${renderGroup(groups.high,'high')}
+    ${renderGroup(groups.mid,'mid')}
+    ${renderGroup(groups.low,'low')}`;
+}
+
+const STOCKS = [
+  { code: "7203", name: "トヨタ自動車" },
+  { code: "9984", name: "ソフトバンクG" },
+  { code: "6758", name: "ソニーグループ" },
+  { code: "8306", name: "三菱UFJ" },
+  { code: "6861", name: "キーエンス" },
+];
+
+async function loadAll() { loadIndexes(); loadStocks(); loadNews(); }
+
+async function loadIndexes() {
+  try {
+    const text = await callClaude([{ role: 'user', content: '今日の日経平均・TOPIX・グロース250の現在値と前日比(%)をJSONのみで返してください。形式:{"nikkei":{"value":"39000","change":"+0.5%"},"topix":{"value":"2700","change":"-0.1%"},"mothers":{"value":"650","change":"+1.2%"}} preambleなし' }]);
+    const d = JSON.parse(text.replace(/```json|```/g,'').trim());
+    document.getElementById('index-cards').innerHTML = [
+      { key:'nikkei', label:'日経平均' },
+      { key:'topix', label:'TOPIX' },
+      { key:'mothers', label:'グロース250' }
+    ].map(({key,label}) => {
+      const v = d[key] || {};
+      const up = (v.change||'').startsWith('+');
+      return `<div class="card"><div class="card-label">${label}</div><div class="card-value">${v.value||'—'}</div><div class="card-change ${up?'up':'down'}">${v.change||'—'}</div></div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('index-cards').innerHTML = `<div class="loading" style="color:#f87171;">取得失敗</div>`;
+  }
+}
+
+async function loadStocks() {
+  const area = document.getElementById('stock-area');
+  area.innerHTML = '<div class="loading">取得中...</div>';
+  try {
+    const list = STOCKS.map(s=>`${s.code}(${s.name})`).join('、');
+    const text = await callClaude([{ role: 'user', content: `以下の日本株の現在値・前日比・一行コメントをJSONで返してください: ${list}\n形式:[{"code":"7203","name":"トヨタ自動車","price":"3500","change":"+1.2%","comment":"好調"}] preambleなし` }]);
+    const stocks = JSON.parse(text.replace(/```json|```/g,'').trim());
+    area.innerHTML = stocks.map(s => {
+      const up = (s.change||'').startsWith('+');
+      return `<div class="stock-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="stock-name">${s.name}</div><div class="stock-meta">${s.code}</div></div><div style="text-align:right"><div style="font-size:18px;font-weight:600">${s.price}</div><div class="card-change ${up?'up':'down'}">${s.change}</div></div></div>${s.comment?`<div style="font-size:12px;color:#666;margin-top:6px">${s.comment}</div>`:''}</div>`;
+    }).join('');
+  } catch(e) {
+    area.innerHTML = `<div class="loading" style="color:#f87171;">取得失敗</div>`;
+  }
+}
+
+async function searchStock() {
+  const q = document.getElementById('stock-input').value.trim();
+  if (!q) return;
+  const area = document.getElementById('stock-area');
+  area.innerHTML = '<div class="loading">検索中...</div>';
+  try {
+    const text = await callClaude([{ role: 'user', content: `「${q}」の株価・前日比・企業概要・最新ニュースを調べて、JSONで返してください。形式:[{"code":"コード","name":"企業名","price":"株価","change":"前日比%","comment":"概要と最新動向"}]` }]);
+    const stocks = JSON.parse(text.replace(/```json|```/g,'').trim());
+    area.innerHTML = stocks.map(s => {
+      const up = (s.change||'').startsWith('+');
+      return `<div class="stock-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="stock-name">${s.name}</div><div class="stock-meta">${s.code}</div></div><div style="text-align:right"><div style="font-size:18px;font-weight:600">${s.price}</div><div class="card-change ${up?'up':'down'}">${s.change}</div></div></div>${s.comment?`<div style="font-size:12px;color:#666;margin-top:6px">${s.comment}</div>`:''}</div>`;
+    }).join('');
+  } catch(e) {
+    area.innerHTML = `<div class="loading" style="color:#f87171;">取得失敗</div>`;
+  }
+}
+
+async function loadNews() {
+  const area = document.getElementById('news-area');
+  area.innerHTML = '<div class="loading">取得中...</div>';
+  try {
+    const text = await callClaude([{ role: 'user', content: '今日の日本・米国・欧州・アジアの主要金融・経済ニュースを5件、JSONで返してください。形式:[{"title":"ニュースタイトル","region":"🇯🇵日本|🇺🇸米国|🇪🇺欧州|🌏アジア","time":"時刻または日付","summary":"概要50字"}] preambleなし' }]);
+    const news = JSON.parse(text.replace(/```json|```/g,'').trim());
+    area.innerHTML = news.map(n => `<div class="news-item"><div class="news-title">${n.region} ${n.title}</div><div class="news-meta">${n.time}${n.summary?` · ${n.summary}`:''}</div></div>`).join('');
+  } catch(e) {
+    area.innerHTML = `<div class="loading" style="color:#f87171;">取得失敗</div>`;
+  }
+}
+
+async function generateReport(type) {
+  const area = document.getElementById('report-area');
+  const isEvening = type === 'evening';
+  area.innerHTML = '<div class="loading">レポートを生成中... （30〜60秒かかります）</div>';
+  const prompt = isEvening
+    ? `あなたは親しみやすい株式アナリストです。今夜の投資家向け「予習レポート」を口語体で書いてください。\n\n1. 📰 今日の主要ニュース（日本・米国・世界）\n2. 🇯🇵 東京市場の今日の動き\n3. 🇺🇸 今夜のNY市場の注目ポイント\n4. 🌍 各国注目ニュース\n5. ⚡ 明日の東京市場への影響予測\n6. 💡 今夜チェックしておきたい3つのこと\n\n友達に話しかけるような口語体で。最後に「今夜もがんばろう！📈」で締めてください。`
+    : `あなたは親しみやすい株式アナリストです。昨夜のNY市場の結果と今朝の東京市場の開幕予測を口語体でまとめてください。\n\n1. 🌙 昨夜のNY市場結果\n2. 📊 セクター別パフォーマンス\n3. 💬 昨夜の決算・ニュースの影響\n4. 🌍 欧州・アジア市場の動き\n5. 🇯🇵 今朝の東京市場 開幕予測\n6. 📌 今日注目する銘柄・セクター3つ\n\n「おはよう！昨夜はね〜」から始めて。最後に「今日も良いトレードを！🌅」で締めてください。`;
+  try {
+    const text = await callClaude([{ role: 'user', content: prompt }], 1500);
+    const title = isEvening ? '🌙 今夜の予習レポート' : '🌅 昨夜の結果まとめ';
+    const now = new Date().toLocaleDateString('ja-JP', { month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    area.innerHTML = `
+      <div class="report-box">
+        <div class="report-header">
+          <span class="report-title">${title}</span>
+          <span class="report-badge">${now}</span>
+        </div>
+        <div class="report-text" id="report-content">${text}</div>
+        <div class="report-actions">
+          <button onclick="copyReport()">📋 コピー</button>
+        </div>
+      </div>`;
+  } catch(e) {
+    area.innerHTML = `<div class="loading" style="color:#f87171;">エラー: ${e.message}</div>`;
+  }
+}
+
+function copyReport() {
+  const content = document.getElementById('report-content');
+  if (content) navigator.clipboard.writeText(content.innerText).then(() => alert('コピーしました！'));
+}
+
+document.getElementById('company-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') analyze('auto'); });
+document.getElementById('stock-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') searchStock(); });
+</script>
+</body>
+</html>
