@@ -2,8 +2,8 @@ name: Evening Report
 
 on:
   schedule:
-    - cron: '0 12 * * 1-5'  # 平日21:00 JST（UTC 12:00）
-  workflow_dispatch:          # 手動実行ボタンも有効
+    - cron: '0 12 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   send-report:
@@ -58,17 +58,19 @@ jobs:
             if (!reportText) throw new Error('No text from Claude');
 
             const dateStr = new Date().toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo' });
-            const message = encodeURIComponent(`\n🌙【今夜の予習レポート】${dateStr}\n\n${reportText}`);
+            const discordPayload = JSON.stringify({
+              content: `🌙【今夜の予習レポート】${dateStr}\n\n${reportText}`.slice(0, 2000)
+            });
 
+            const webhookUrl = new URL(process.env.DISCORD_WEBHOOK_URL);
             await httpsPost(
-              'notify-api.line.me',
-              '/api/notify',
+              webhookUrl.hostname,
+              webhookUrl.pathname,
               {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Bearer ${process.env.LINE_NOTIFY_TOKEN}`,
-                'Content-Length': Buffer.byteLength(`message=${message}`)
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(discordPayload)
               },
-              `message=${message}`
+              discordPayload
             );
 
             console.log('Evening report sent successfully');
@@ -78,4 +80,4 @@ jobs:
           EOF
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          LINE_NOTIFY_TOKEN: ${{ secrets.LINE_NOTIFY_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
