@@ -1,0 +1,81 @@
+name: Morning Report
+
+on:
+  schedule:
+    - cron: '0 20 * * 0-4'  # 平日朝5:00 JST（UTC 前日20:00）
+  workflow_dispatch:          # 手動実行ボタンも有効
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate and send morning report
+        run: |
+          node << 'EOF'
+          const https = require('https');
+
+          function httpsPost(hostname, path, headers, body) {
+            return new Promise((resolve, reject) => {
+              const req = https.request({ hostname, path, method: 'POST', headers }, (res) => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => resolve({ status: res.statusCode, body: data }));
+              });
+              req.on('error', reject);
+              req.write(body);
+              req.end();
+            });
+          }
+
+          async function main() {
+            const payload = JSON.stringify({
+              model: 'claude-sonnet-4-5',
+              max_tokens: 2000,
+              tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+              messages: [{
+                role: 'user',
+                content: 'あなたは親しみやすい株式アナリストです。昨夜のNY市場の結果と今朝の東京市場の開幕予測を口語体でまとめてください。1. 🌙 昨夜のNY市場結果（ダウ・S&P500・ナスダック）2. 📊 セクター別パフォーマンス 3. 💬 昨夜の決算発表・主要ニュースの影響 4. 🌍 欧州・アジア市場の動き 5. 🇯🇵 今朝の東京市場 開幕予測 6. 📌 今日の注目銘柄・セクター3つ。「おはよう！昨夜はね〜」から始めて。最後に「今日も良いトレードを！🌅」で締めてください。'
+              }]
+            });
+
+            const res = await httpsPost(
+              'api.anthropic.com',
+              '/v1/messages',
+              {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.ANTHROPIC_API_KEY,
+                'anthropic-version': '2023-06-01',
+                'Content-Length': Buffer.byteLength(payload)
+              },
+              payload
+            );
+
+            const data = JSON.parse(res.body);
+            let reportText = '';
+            for (const block of (data.content || [])) {
+              if (block.type === 'text') reportText += block.text;
+            }
+            if (!reportText) throw new Error('No text from Claude');
+
+            const dateStr = new Date().toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo' });
+            const message = encodeURIComponent(`\n🌅【昨夜の結果まとめ】${dateStr}\n\n${reportText}`);
+
+            await httpsPost(
+              'notify-api.line.me',
+              '/api/notify',
+              {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Bearer ${process.env.LINE_NOTIFY_TOKEN}`,
+                'Content-Length': Buffer.byteLength(`message=${message}`)
+              },
+              `message=${message}`
+            );
+
+            console.log('Morning report sent successfully');
+          }
+
+          main().catch(e => { console.error(e); process.exit(1); });
+          EOF
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LINE_NOTIFY_TOKEN: ${{ secrets.LINE_NOTIFY_TOKEN }}
