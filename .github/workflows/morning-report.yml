@@ -44,6 +44,7 @@ jobs:
               payload
             );
             const data = JSON.parse(res.body);
+            console.error('DEBUG:', res.status, JSON.stringify(data.error), JSON.stringify((data.content||[]).map(b=>b.type)));
             let reportText = '';
             for (const block of (data.content || [])) {
               if (block.type === 'text') reportText += block.text;
