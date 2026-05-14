@@ -57,26 +57,28 @@ jobs:
             if (!reportText) throw new Error('No text from Claude');
 
             const dateStr = new Date().toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo' });
-            const discordPayload = JSON.stringify({
-              content: `🌅【昨夜の結果まとめ】${dateStr}\n\n${reportText}`.slice(0, 2000)
-            });
+           const webhookUrl = new URL(process.env.DISCORD_WEBHOOK_URL);const fullText = `🌅【昨夜の結果まとめ】${dateStr}\n\n${reportText}`;
+const chunks = [];
+let remaining = fullText;
+while (remaining.length > 0) {
+  chunks.push(remaining.slice(0, 2000));
+  remaining = remaining.slice(2000);
+}
+for (const chunk of chunks) {
+  const discordPayload = JSON.stringify({ content: chunk });
+  await httpsPost(
+    webhookUrl.hostname,
+    webhookUrl.pathname,
+    {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(discordPayload)
+    },
+    discordPayload
+  );
+}
+console.log('Morning report sent successfully');
+}
+main().catch(e => { console.error(e); process.exit(1); });
+EOF
 
-            const webhookUrl = new URL(process.env.DISCORD_WEBHOOK_URL);
-            await httpsPost(
-              webhookUrl.hostname,
-              webhookUrl.pathname,
-              {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(discordPayload)
-              },
-              discordPayload
-            );
-
-            console.log('Morning report sent successfully');
-          }
-
-          main().catch(e => { console.error(e); process.exit(1); });
-          EOF
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+     
