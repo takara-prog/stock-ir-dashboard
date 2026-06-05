@@ -92,6 +92,7 @@ button:hover { background: #1e1e1e; }
     <button class="main-tab active" onclick="switchMain('ir')">🔍 IR分析</button>
     <button class="main-tab" onclick="switchMain('market')">📈 市場</button>
     <button class="main-tab" onclick="switchMain('report')">🌙 レポート</button>
+    <button class="main-tab" onclick="switchMain('youtube')">▶ YouTube分析</button>
   </div>
 
   <div id="main-ir" class="main-panel active">
@@ -128,6 +129,28 @@ button:hover { background: #1e1e1e; }
     <div id="news-area"><div class="loading">ニュースを取得中...</div></div>
   </div>
 
+  <div id="main-youtube" class="main-panel">
+    <div class="tabs">
+      <button class="tab active" onclick="switchYtTab('url')">URLで分析</button>
+      <button class="tab" onclick="switchYtTab('transcript')">文字起こしで分析</button>
+    </div>
+    <div id="yt-panel-url" class="panel active">
+      <div class="row" style="margin-bottom:8px;">
+        <input type="text" id="yt-url-input" placeholder="YouTubeのURL（例：https://youtu.be/xxxxx）" />
+      </div>
+      <div style="font-size:12px;color:#555;margin-bottom:8px;">※ 動画の概要・タイトルを基に、投資・株式観点で分析します</div>
+      <button class="analyze-btn" onclick="analyzeYoutube('url')">この動画を分析する →</button>
+    </div>
+    <div id="yt-panel-transcript" class="panel">
+      <div class="row" style="margin-bottom:8px;">
+        <input type="text" id="yt-title-input" placeholder="動画タイトル（任意）" />
+      </div>
+      <textarea id="yt-transcript-input" placeholder="YouTubeの文字起こしや概要欄のテキストを貼り付けてください..."></textarea>
+      <button class="analyze-btn" onclick="analyzeYoutube('transcript')" style="margin-top:8px;">文字起こしを分析する →</button>
+    </div>
+    <div id="yt-results-area"></div>
+  </div>
+
   <div id="main-report" class="main-panel">
     <div class="cron-grid">
       <div class="cron-card">
@@ -153,12 +176,10 @@ button:hover { background: #1e1e1e; }
 
 <script>
 function switchMain(tab) {
-  document.querySelectorAll('.main-tab').forEach((t,i) => {
-    t.classList.toggle('active', ['ir','market','report'][i] === tab);
-  });
-  document.querySelectorAll('.main-panel').forEach((p,i) => {
-    p.classList.toggle('active', ['main-ir','main-market','main-report'][i] === 'main-'+tab);
-  });
+  const tabs = ['ir','market','youtube','report'];
+  const panels = ['main-ir','main-market','main-youtube','main-report'];
+  document.querySelectorAll('.main-tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
+  document.querySelectorAll('.main-panel').forEach((p,i) => p.classList.toggle('active', panels[i] === 'main-'+tab));
   if (tab === 'market') loadAll();
 }
 
@@ -347,6 +368,72 @@ function copyReport() {
 
 document.getElementById('company-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') analyze('auto'); });
 document.getElementById('stock-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') searchStock(); });
+document.getElementById('yt-url-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') analyzeYoutube('url'); });
+
+function switchYtTab(tab) {
+  document.querySelectorAll('#main-youtube .tab').forEach((t,i) => t.classList.toggle('active', ['url','transcript'][i] === tab));
+  document.getElementById('yt-panel-url').classList.toggle('active', tab === 'url');
+  document.getElementById('yt-panel-transcript').classList.toggle('active', tab === 'transcript');
+}
+
+async function analyzeYoutube(mode) {
+  const area = document.getElementById('yt-results-area');
+  area.innerHTML = '<div class="loading">動画を分析中... しばらくお待ちください</div>';
+  try {
+    let prompt = '';
+    if (mode === 'url') {
+      const url = document.getElementById('yt-url-input').value.trim();
+      if (!url) { area.innerHTML = ''; return; }
+      prompt = `以下のYouTube動画URL: ${url}\n\nこの動画のタイトルや内容を推測し、投資家・株式市場の観点から分析してください。`;
+    } else {
+      const title = document.getElementById('yt-title-input').value.trim();
+      const transcript = document.getElementById('yt-transcript-input').value.trim();
+      if (!transcript) { area.innerHTML = ''; return; }
+      prompt = `以下のYouTube動画${title ? `「${title}」` : ''}の文字起こし・概要を分析してください:\n\n${transcript}`;
+    }
+    prompt += `\n\n投資家・株式市場の観点から以下のJSON形式のみで返してください（前置き不要）:\n{"title":"動画タイトルまたは推定タイトル","summary":"動画の内容要約100字","investment_relevance":"high|mid|low","key_points":[{"point":"注目ポイント","impact":"high|mid|low","sector":"関連セクター（例：AI・半導体・不動産など）","note":"投資家への示唆50字"}],"related_stocks":["関連する可能性のある企業や銘柄（日本株）"],"verdict":"投資家視点での総評100字"}`;
+    const raw = await callClaude([{ role: 'user', content: prompt }], 1000);
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const d = JSON.parse(clean);
+    renderYoutubeResults(d, area);
+  } catch(e) {
+    area.innerHTML = `<div class="loading" style="color:#f87171;">エラー: ${e.message}</div>`;
+  }
+}
+
+function renderYoutubeResults(d, area) {
+  const relevanceColor = { high: '#f87171', mid: '#fbbf24', low: '#4ade80' };
+  const relevanceLabel = { high: '高関連度', mid: '中関連度', low: '低関連度' };
+  const rel = d.investment_relevance || 'low';
+  const points = (d.key_points || []);
+  const stocks = (d.related_stocks || []);
+  area.innerHTML = `
+    <div style="margin-top:1.5rem;">
+      <div style="font-size:13px;color:#666;margin-bottom:12px;">▶ ${d.title || '動画分析結果'}</div>
+      <div class="summary-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="scard" style="grid-column:1/3"><div class="scard-label">動画概要</div><div style="font-size:14px;line-height:1.6;margin-top:4px;">${d.summary||'—'}</div></div>
+        <div class="scard"><div class="scard-label">投資関連度</div><div class="scard-val" style="color:${relevanceColor[rel]};font-size:16px;">${relevanceLabel[rel]}</div></div>
+      </div>
+      ${points.length ? '<div class="section-label">注目ポイント</div>' + points.map(p => {
+        const impactLabel = p.impact === 'high' ? '高' : p.impact === 'mid' ? '中' : '低';
+        return `<div class="stmt">
+          <div class="stmt-text">${p.point}</div>
+          <div class="stmt-meta">
+            <span class="badge ${p.impact}">${impactLabel}影響</span>
+            ${p.sector ? `<span class="tag">${p.sector}</span>` : ''}
+          </div>
+          ${p.note ? `<div class="note">投資示唆：${p.note}</div>` : ''}
+        </div>`;
+      }).join('') : ''}
+      ${stocks.length ? `
+      <div class="section-label">関連銘柄候補</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;">
+        ${stocks.map(s => `<span class="tag" style="font-size:12px;padding:4px 10px;">${s}</span>`).join('')}
+      </div>` : ''}
+      <div class="section-label">投資家視点の総評</div>
+      <div class="report-box"><div class="report-text" style="font-size:14px;">${d.verdict||'—'}</div></div>
+    </div>`;
+}
 </script>
 </body>
 </html>
