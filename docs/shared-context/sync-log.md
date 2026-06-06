@@ -5,6 +5,39 @@
 
 ---
 
+## 2026-06-06 Netlify切り分け結果
+
+### 変更された前提
+- Netlify Deploy Preview失敗（PR #2）は今回のPR変更とは無関係と判断
+
+### 決定したこと
+- PR #2（docs/shared-context/*.md追加のみ）でNetlify設定変更は行わない
+- Netlify Deploy Preview失敗は既存Netlify側問題の可能性。今回PR変更とは無関係と判断
+- Netlify問題を調査・修正する場合は別Issue/別PRで扱う
+
+### 作成・更新したファイル
+- 更新: `docs/shared-context/sync-log.md`（このエントリ追記）
+
+### GitHub / Netlify / Claude Code 状態
+- PR #2: Draft、レビュー待ち
+- Netlify Deploy Preview: failure（PR変更とは無関係、既存問題の可能性）
+- GitHub Actions: 変更なし
+- 本番（main）のNetlify: 影響なし
+
+### ChatGPTに共有すべき差分
+- Netlify Deploy Preview失敗はPR #2の変更（markdownのみ）とは無関係と確認済み
+- Netlify調査は別対応予定
+
+### 未解決・確認待ち
+- Netlify Deploy Preview失敗の根本原因（Netlifyダッシュボードで要確認）
+
+### 次に相談するなら貼るべき情報
+1. `chatgpt-briefing.md` の「ChatGPTに貼る短縮版」
+2. このsync-logの最新エントリ
+3. 具体的な質問
+
+---
+
 ## 2026-06-06 作業日
 
 ### 変更された前提
