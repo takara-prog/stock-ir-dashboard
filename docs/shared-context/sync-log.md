@@ -5,6 +5,45 @@
 
 ---
 
+## 2026-06-10 役割分担設計の確定
+
+### 変更された前提
+- ClaudeとChatGPTの役割を「2者」から「4者モデル」に明確化
+- 管理主体はClaudeに確定（ChatGPTは管理主体でない）
+- Claude Code をPC実行担当として明示的に分離
+
+### 決定したこと
+- Claude = 管理主体・共通台帳更新・実行方針決定
+- Claude Code = PC実行担当（ファイル作成・GitHub操作・PR）
+- ChatGPT = 外部参謀（外部レビュー・リスク判定・Claudeへの指示文作成）。実行権限なし
+- GitHub / docs = 共通台帳の保管場所
+- ChatGPTを管理主体として扱わない
+
+### 作成・更新したファイル
+- 更新: `docs/shared-context/source-of-truth.md`（セクション4 役割分担を4者モデルに改訂）
+- 更新: `docs/shared-context/chatgpt-briefing.md`（役割表・テンプレート・短縮版を4者モデルに改訂）
+- 更新: `docs/shared-context/sync-log.md`（このエントリ追記）
+
+### GitHub / Netlify / Claude Code 状態
+- PR #2: Draft、マージ可能
+- Netlify Deploy Preview: 既存問題のため失敗継続中（PR変更とは無関係）
+- GitHub Actions: 変更なし
+
+### ChatGPTに共有すべき差分
+- 役割分担が4者モデルに確定した（Claude管理・Claude Code実行・ChatGPT外部参謀）
+- ChatGPTに相談するテンプレートが更新された（末尾の短縮版参照）
+
+### 未解決・確認待ち
+- Netlify Deploy Preview失敗の根本原因（別途対応）
+- work-agents / library / context-headroom-rules の設計仕様
+
+### 次に相談するなら貼るべき情報
+1. `chatgpt-briefing.md` の「ChatGPTに貼る短縮版」（末尾セクション）
+2. このsync-logの最新エントリ（↑このブロック）
+3. 具体的な質問
+
+---
+
 ## 2026-06-06 Netlify切り分け結果
 
 ### 変更された前提
