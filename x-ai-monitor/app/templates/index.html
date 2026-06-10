@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}ホーム — X AI Monitor{% endblock %}
+
+{% block content %}
+
+{% if request.query_params.get('mock') %}
+<div class="alert alert-success">
+  ✅ モックデータを {{ request.query_params.get('mock') }} 件生成しました。
+</div>
+{% endif %}
+
+{% if request.query_params.get('analyzed') %}
+<div class="alert alert-success">
+  ✅ 分析を実行しました。結果は下の「最新分析」に反映されます。
+</div>
+{% endif %}
+
+<div class="page-title">
+  キーワード「<strong>{{ keyword }}</strong>」の直近 7 日間
+  <span class="badge badge-blue" style="font-size:0.8rem; vertical-align:middle;">{{ tweet_count }} 件</span>
+</div>
+
+<!-- Analysis card -->
+<div class="card">
+  <div class="card-header">📊 最新 AI 分析</div>
+  {% if analysis %}
+    <div style="margin-bottom:0.5rem; font-size:0.75rem; color:#a0aec0;">
+      分析日時: {{ analysis.analyzed_at[:16] | replace('T', ' ') }} UTC
+      &nbsp;|&nbsp; 期間: {{ analysis.period_start }} 〜 {{ analysis.period_end }}
+    </div>
+    <div class="analysis-box">{{ analysis.result }}</div>
+  {% else %}
+    <p class="empty-state">
+      まだ分析がありません。<br>
+      7 日分のデータが溜まったら <strong>/status</strong> から「今すぐ分析」を実行してください。<br>
+      テスト用に <strong>モックデータを生成</strong> することもできます。
+    </p>
+    <div class="action-bar" style="justify-content:center; margin-top:1rem;">
+      <form method="post" action="/admin/mock">
+        <button class="btn btn-ghost btn-sm" type="submit">🧪 テストデータ生成（7日分）</button>
+      </form>
+      <form method="post" action="/admin/analyze">
+        <button class="btn btn-primary btn-sm" type="submit">▶ 今すぐ分析</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Tweets card -->
+<div class="card">
+  <div class="card-header">🐦 収集ツイート一覧</div>
+
+  {% if not tweets %}
+    <p class="empty-state">
+      ツイートがまだありません。<br>
+      スケジューラーが毎日 {{ cfg.collect_hour if cfg is defined else '8' }}:00 JST に自動収集します。<br>
+      今すぐ試すには <a href="/status" style="color:#1da1f2;">ステータスページ</a> から手動収集できます。
+    </p>
+  {% else %}
+    {% set ns = namespace(current_date='') %}
+    <div class="tweet-list">
+      {% for tw in tweets %}
+        {% if tw.collected_date != ns.current_date %}
+          {% set ns.current_date = tw.collected_date %}
+          <div class="date-group-header">{{ tw.collected_date }}</div>
+        {% endif %}
+        <div class="tweet-item">
+          <div class="tweet-text">{{ tw.text }}</div>
+          <div class="tweet-meta">
+            <span>❤️ {{ tw.likes }}</span>
+            <span>🔁 {{ tw.retweets }}</span>
+            {% if tw.created_at %}
+            <span>🕐 {{ tw.created_at[:10] }}</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

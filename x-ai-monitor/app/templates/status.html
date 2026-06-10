@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}ステータス — X AI Monitor{% endblock %}
+
+{% block content %}
+<div class="page-title">📡 ステータス</div>
+
+<!-- Scheduler status -->
+<div class="card">
+  <div class="card-header">スケジューラー</div>
+  <table>
+    <tr>
+      <th>ジョブ</th>
+      <th>設定</th>
+      <th>次回実行 (JST)</th>
+    </tr>
+    <tr>
+      <td>ツイート収集</td>
+      <td>毎日 {{ "%02d"|format(cfg.collect_hour) }}:00</td>
+      <td><span class="badge badge-blue">{{ next_collect }}</span></td>
+    </tr>
+    <tr>
+      <td>Claude 分析 + Telegram 送信</td>
+      <td>毎週 {{ cfg.analyze_weekday }} {{ "%02d"|format(cfg.collect_hour + 1) }}:00</td>
+      <td><span class="badge badge-green">{{ next_analyze }}</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- Last run info -->
+<div class="card">
+  <div class="card-header">直近の実行結果</div>
+  <table>
+    <tr>
+      <th>項目</th>
+      <th>内容</th>
+    </tr>
+    <tr>
+      <td>最終収集日時</td>
+      <td>{{ last_collect_at | replace('T', ' ') if last_collect_at else '—' }} UTC</td>
+    </tr>
+    <tr>
+      <td>最終収集件数</td>
+      <td>{{ last_collect_count if last_collect_count else '—' }} 件</td>
+    </tr>
+    <tr>
+      <td>最終分析日時</td>
+      <td>{{ last_analyze_at | replace('T', ' ') if last_analyze_at else '—' }} UTC</td>
+    </tr>
+    {% if last_collect_error %}
+    <tr>
+      <td>収集エラー</td>
+      <td><span class="badge badge-red">{{ last_collect_error }}</span></td>
+    </tr>
+    {% endif %}
+    {% if last_analyze_error %}
+    <tr>
+      <td>分析エラー</td>
+      <td><span class="badge badge-red">{{ last_analyze_error }}</span></td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+<!-- Manual actions -->
+<div class="card">
+  <div class="card-header">手動実行</div>
+  <div class="action-bar">
+    <form method="post" action="/admin/collect">
+      <button class="btn btn-primary" type="submit">▶ 今すぐ収集</button>
+    </form>
+    <form method="post" action="/admin/analyze">
+      <button class="btn btn-success" type="submit">📊 今すぐ分析・送信</button>
+    </form>
+    <form method="post" action="/admin/mock">
+      <button class="btn btn-ghost" type="submit">🧪 テストデータ生成（7日×10件）</button>
+    </form>
+  </div>
+  <p style="font-size:0.78rem; color:#a0aec0; margin-top:0.5rem;">
+    ※ テストデータ生成は実際の API を呼ばず、ダミーツイートを DB に挿入します。
+  </p>
+</div>
+
+<!-- Collection history -->
+<div class="card">
+  <div class="card-header">収集履歴（直近 14 日）</div>
+  {% if collect_status %}
+  <table>
+    <tr>
+      <th>日付</th>
+      <th>収集件数</th>
+    </tr>
+    {% for row in collect_status %}
+    <tr>
+      <td>{{ row.collected_date }}</td>
+      <td>
+        <span class="badge {{ 'badge-green' if row.count >= 10 else 'badge-yellow' }}">
+          {{ row.count }} 件
+        </span>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="empty-state">収集履歴がありません。</p>
+  {% endif %}
+</div>
+
+<!-- Analysis history -->
+<div class="card">
+  <div class="card-header">分析履歴（直近 5 件）</div>
+  {% if analyses %}
+    {% for a in analyses %}
+    <div style="margin-bottom:1.25rem; padding-bottom:1.25rem;
+                border-bottom: 1px solid #f0f2f5; {% if loop.last %}border:none{% endif %}">
+      <div style="font-size:0.75rem; color:#a0aec0; margin-bottom:0.4rem;">
+        {{ a.analyzed_at[:16] | replace('T', ' ') }} UTC
+        &nbsp;|&nbsp; {{ a.period_start }} 〜 {{ a.period_end }}
+        &nbsp;|&nbsp; キーワード: <strong>{{ a.keyword }}</strong>
+      </div>
+      <div class="analysis-box">{{ a.result }}</div>
+    </div>
+    {% endfor %}
+  {% else %}
+  <p class="empty-state">分析履歴がありません。</p>
+  {% endif %}
+</div>
+
+{% endblock %}

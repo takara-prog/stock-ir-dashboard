@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}設定 — X AI Monitor{% endblock %}
+
+{% block content %}
+<div class="page-title">⚙️ 設定</div>
+
+{% if saved %}
+<div class="alert alert-success">✅ 設定を保存しました。スケジューラーも更新されました。</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-danger">❌ {{ error }}</div>
+{% endif %}
+
+<form method="post" action="/config">
+
+  <!-- Monitor -->
+  <div class="card">
+    <div class="card-header">モニタリング設定</div>
+
+    <div class="form-group">
+      <label>監視キーワード</label>
+      <input type="text" name="monitor_keyword" value="{{ cfg.monitor_keyword }}" required
+             placeholder="例: 株、NISA、円高">
+      <div class="form-hint">X (Twitter) を検索するキーワードです。変更は次回収集から反映されます。</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-group">
+        <label>収集時刻（JST・毎日）</label>
+        <select name="collect_hour">
+          {% for h in range(24) %}
+          <option value="{{ h }}" {% if h == cfg.collect_hour %}selected{% endif %}>
+            {{ "%02d"|format(h) }}:00
+          </option>
+          {% endfor %}
+        </select>
+        <div class="form-hint">毎日この時刻にツイートを 10 件収集します。</div>
+      </div>
+
+      <div class="form-group">
+        <label>週次分析送信曜日</label>
+        <select name="analyze_weekday">
+          {% for wd in weekdays %}
+          <option value="{{ wd }}" {% if wd == cfg.analyze_weekday %}selected{% endif %}>{{ wd }}</option>
+          {% endfor %}
+        </select>
+        <div class="form-hint">この曜日に 7 日分を Claude で分析し Telegram に送信します。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Keys -->
+  <div class="card">
+    <div class="card-header">API キー設定</div>
+    <div class="alert alert-warning">
+      🔒 API キーはマスクして表示されます。変更する場合のみ新しい値を入力してください。
+      空欄のままにすると現在の値が保持されます。
+    </div>
+
+    <div class="form-section">X (Twitter)</div>
+    <div class="form-group">
+      <label>Twitter Bearer Token (TWITTER_API_KEY)</label>
+      <input type="password" name="twitter_api_key"
+             placeholder="{{ twitter_api_key_masked if twitter_api_key_masked else '未設定' }}"
+             autocomplete="new-password">
+      <div class="form-hint">X Developer Portal → Project → Bearer Token。Basic プラン以上が必要。</div>
+    </div>
+
+    <div class="form-section">Anthropic Claude</div>
+    <div class="form-group">
+      <label>Anthropic API Key</label>
+      <input type="password" name="anthropic_api_key"
+             placeholder="{{ anthropic_api_key_masked if anthropic_api_key_masked else '未設定' }}"
+             autocomplete="new-password">
+      <div class="form-hint">console.anthropic.com → API Keys</div>
+    </div>
+
+    <div class="form-section">Telegram</div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Bot Token</label>
+        <input type="password" name="telegram_bot_token"
+               placeholder="{{ telegram_bot_token_masked if telegram_bot_token_masked else '未設定' }}"
+               autocomplete="new-password">
+        <div class="form-hint">@BotFather → /newbot</div>
+      </div>
+      <div class="form-group">
+        <label>Chat ID</label>
+        <input type="text" name="telegram_chat_id"
+               value="{{ cfg.telegram_chat_id }}"
+               placeholder="例: 123456789">
+        <div class="form-hint">自分のユーザー ID または グループ ID</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" type="submit">💾 保存</button>
+  <a href="/" class="btn btn-ghost" style="margin-left:0.5rem;">キャンセル</a>
+</form>
+{% endblock %}

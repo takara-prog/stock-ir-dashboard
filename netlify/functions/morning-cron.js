@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 exports.handler = async function(event) {
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
   const RESEND_API_KEY = process.env.RESEND_API_KEY;

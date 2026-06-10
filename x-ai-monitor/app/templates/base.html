@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}X AI Monitor{% endblock %}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+           background: #f0f2f5; color: #1a1a2e; line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+
+    /* Header */
+    header { background: #1a1a2e; color: #fff; padding: 0.875rem 1.5rem;
+             display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 100;
+             box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+    header .logo { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
+    header nav { margin-left: auto; display: flex; gap: 0.25rem; }
+    header nav a { padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.85rem; color: #a0aec0;
+                   transition: all 0.15s; }
+    header nav a:hover, header nav a.active { background: rgba(255,255,255,.1); color: #fff; }
+
+    /* Layout */
+    main { max-width: 960px; margin: 2rem auto; padding: 0 1rem 4rem; }
+    .page-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; color: #1a1a2e; }
+
+    /* Card */
+    .card { background: #fff; border-radius: 12px; padding: 1.5rem;
+            margin-bottom: 1.25rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .card-header { font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: 0.08em; color: #718096; margin-bottom: 1rem; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.6rem;
+             border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+    .badge-blue   { background: #ebf8ff; color: #2b6cb0; }
+    .badge-green  { background: #f0fff4; color: #276749; }
+    .badge-gray   { background: #f7fafc; color: #4a5568; border: 1px solid #e2e8f0; }
+    .badge-yellow { background: #fffff0; color: #744210; }
+    .badge-red    { background: #fff5f5; color: #c53030; }
+
+    /* Alert */
+    .alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.875rem; }
+    .alert-success { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; }
+    .alert-warning { background: #fffff0; border: 1px solid #f6e05e; color: #744210; }
+    .alert-danger  { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1.1rem;
+           border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+           transition: all 0.15s; }
+    .btn-primary { background: #1da1f2; color: #fff; }
+    .btn-primary:hover { background: #0d8ecf; }
+    .btn-success { background: #38a169; color: #fff; }
+    .btn-success:hover { background: #276749; }
+    .btn-danger  { background: #e53e3e; color: #fff; }
+    .btn-danger:hover  { background: #c53030; }
+    .btn-ghost  { background: transparent; color: #4a5568; border: 1px solid #e2e8f0; }
+    .btn-ghost:hover  { background: #f7fafc; }
+    .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.8rem; }
+
+    /* Form */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #4a5568; margin-bottom: 0.35rem; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 0.55rem 0.75rem; border: 1px solid #e2e8f0;
+      border-radius: 8px; font-size: 0.9rem; transition: border 0.15s;
+      background: #fff; }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: #1da1f2; box-shadow: 0 0 0 3px rgba(29,161,242,.15); }
+    .form-hint { font-size: 0.75rem; color: #a0aec0; margin-top: 0.25rem; }
+    .form-section { font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+                    letter-spacing: 0.08em; color: #718096; margin: 1.5rem 0 0.75rem; padding-bottom: 0.4rem;
+                    border-bottom: 1px solid #f0f2f5; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Tweet */
+    .tweet-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .tweet-item { border-left: 3px solid #1da1f2; padding: 0.75rem 1rem;
+                  background: #f7fafc; border-radius: 0 8px 8px 0; }
+    .tweet-text { font-size: 0.875rem; line-height: 1.55; }
+    .tweet-meta { font-size: 0.72rem; color: #a0aec0; margin-top: 0.4rem;
+                  display: flex; gap: 0.8rem; }
+    .tweet-meta span { display: flex; align-items: center; gap: 0.2rem; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+         color: #718096; padding: 0.5rem 0.75rem; border-bottom: 2px solid #f0f2f5; }
+    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #f7fafc; }
+    tr:last-child td { border-bottom: none; }
+
+    /* Analysis */
+    .analysis-box { white-space: pre-wrap; font-size: 0.875rem; line-height: 1.7;
+                    background: #f7fafc; border-radius: 8px; padding: 1rem 1.25rem; }
+    .empty-state { text-align: center; color: #a0aec0; padding: 2rem 1rem; font-size: 0.9rem; }
+
+    /* Date header */
+    .date-group-header { font-size: 0.72rem; font-weight: 700; color: #a0aec0;
+                         text-transform: uppercase; margin: 1rem 0 0.4rem; }
+    .date-group-header:first-child { margin-top: 0; }
+
+    /* Action bar */
+    .action-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="logo">🐦 X AI Monitor</span>
+    <nav>
+      <a href="/" {% if request.url.path == '/' %}class="active"{% endif %}>ホーム</a>
+      <a href="/config" {% if request.url.path == '/config' %}class="active"{% endif %}>設定</a>
+      <a href="/status" {% if request.url.path == '/status' %}class="active"{% endif %}>ステータス</a>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
