@@ -8,8 +8,10 @@
 
 | 優先度 | 作業名 | 担当 | 最初の一手 | 完了条件 | 期限 | 状態 |
 |---|---|---|---|---|---|---|
-| P1 | x-ai-monitor README self-host MVP補完 | Claude（実行者） | x-ai-monitor ブランチのREADMEに self-host明記・セキュリティ注意を追記 | README読んでdocker compose upできる・self-hostである旨明記 | 2026-06-10 | 進行中 |
-| P3 | Windows側 work-agents へのZIP配置 | ユーザー | GitHubからZIPDL→ai-meeting-hubのみコピー | `C:\Users\bellc\work-agents\ai-meeting-hub` に23ファイル存在 | 次回PC操作時 | 未着手 |
+| P0 | x-ai-monitor の展開方針を決める | ユーザー + Claude | MTG-2026-0610-001.md を使って self-host/hosted を比較する | 今日やる範囲とやらない範囲が決まる | 2026-06-10 | **完了** |
+| P1 | x-ai-monitor README self-host MVP補完 | Claude（実行者） | x-ai-monitor ブランチのREADMEに self-host明記・セキュリティ注意を追記 | README読んでdocker compose upできる・self-hostである旨明記 | 2026-06-10 | **完了** |
+| P1 | x-ai-monitor スクリーンショット / デモ動画作成 | ユーザー | docker compose up → /status → テストデータ → 分析の流れを記録 | ポートフォリオに使える画像・動画が手元にある | 今週中 | 未着手 |
+| P3 | Windows側 work-agents へのZIP配置 | ユーザー | GitHubからZIPDL→ai-meeting-hubのみコピー | `C:\Users\bellc\work-agents\ai-meeting-hub` に24ファイル存在 | 次回PC操作時 | **完了** |
 
 ---
 
