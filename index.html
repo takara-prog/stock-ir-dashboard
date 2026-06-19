@@ -153,12 +153,10 @@ button:hover { background: #1e1e1e; }
 
 <script>
 function switchMain(tab) {
-  document.querySelectorAll('.main-tab').forEach((t,i) => {
-    t.classList.toggle('active', ['ir','market','report'][i] === tab);
-  });
-  document.querySelectorAll('.main-panel').forEach((p,i) => {
-    p.classList.toggle('active', ['main-ir','main-market','main-report'][i] === 'main-'+tab);
-  });
+  const tabs = ['ir','market','report'];
+  const panels = ['main-ir','main-market','main-report'];
+  document.querySelectorAll('.main-tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
+  document.querySelectorAll('.main-panel').forEach((p,i) => p.classList.toggle('active', panels[i] === 'main-'+tab));
   if (tab === 'market') loadAll();
 }
 
